@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin("http://3.227.89.83")
 @RestController
 @RequestMapping(value = "/User")
 public class UserController {
