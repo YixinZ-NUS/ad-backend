@@ -1,14 +1,8 @@
 package sg.nus.iss.javaspring.adprojrct.Services;
 
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationParam;
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
-import com.alibaba.dashscope.common.MultiModalMessage;
-import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.exception.ApiException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.exception.UploadFileException;
-import io.reactivex.Flowable;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -23,10 +17,14 @@ import sg.nus.iss.javaspring.adprojrct.Repositories.CategoryRepository;
 import sg.nus.iss.javaspring.adprojrct.Repositories.TransactionRepository;
 import sg.nus.iss.javaspring.adprojrct.Repositories.UserRepository;
 
-import java.io.*;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.time.YearMonth;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,6 +76,7 @@ public class TransactionServiceImpl implements TransactionService{
             transaction.setUser(optionalUser.get());
             transaction.setCategory(optionalCategory.get());
             transaction.setUpdated_at(LocalDateTime.now());
+
             return transactionRepository.save(transaction);
         } else {
             throw new EntityNotFoundException("User or Category not found");
@@ -107,14 +106,23 @@ public class TransactionServiceImpl implements TransactionService{
     }
 
 
+
     @Override
-    public double getTotalSpendingLastMonth(int userId) {
-        return getTotalSpending(userId, LocalDate.now().minusMonths(1), LocalDate.now());
+    public double getTotalSpendingThisMonth(int userId) {
+        YearMonth thisMonth = YearMonth.now();
+        LocalDate startDate = thisMonth.atDay(1);
+        LocalDate endDate = LocalDate.now();
+
+        return getTotalSpending(userId, startDate, endDate);
     }
 
     @Override
     public double getTotalSpendingPreviousMonth(int userId) {
-        return getTotalSpending(userId, LocalDate.now().minusMonths(2), LocalDate.now().minusMonths(1));
+        YearMonth previousMonth = YearMonth.now().minusMonths(1);
+        LocalDate startDate = previousMonth.atDay(1);
+        LocalDate endDate = previousMonth.atEndOfMonth();
+
+        return getTotalSpending(userId, startDate, endDate);
     }
 
     @Override
@@ -152,7 +160,6 @@ public class TransactionServiceImpl implements TransactionService{
         }).collect(Collectors.toList());
     }
 
-
     private double getTotalSpending(int userId, LocalDate startDate, LocalDate endDate) {
         List<Transaction> transactions = transactionRepository.findTransactionsByUserIdAndDateRange(userId, startDate, endDate);
 
@@ -176,24 +183,7 @@ public class TransactionServiceImpl implements TransactionService{
         return transactionRepository.findAverageAmountPerCategory();
     }
 
-//    @Override
-//    public void deleteTransaction(Integer transactionId) {
-//        if (!transactionRepository.existsById(transactionId)) {
-//            throw new EntityNotFoundException("Transaction not found with ID: " + transactionId);
-//        }
-//        transactionRepository.deleteById(transactionId);
-//    }
-//
-//    @Override
-//    public Transaction updateTransaction(Transaction transaction, Integer transactionId) {
-//        return transactionRepository.findById(transactionId).map(existingTransaction -> {
-//            existingTransaction.setAmount(transaction.getAmount());
-//            existingTransaction.setDescription(transaction.getDescription());
-//            existingTransaction.setCreated_at(transaction.getCreated_at());
-//            existingTransaction.setUpdated_at(LocalDateTime.now());
-//            return transactionRepository.save(existingTransaction);
-//        }).orElseThrow(() -> new EntityNotFoundException("Transaction not found with ID: " + transactionId));
-//    }
+
 
 
 }

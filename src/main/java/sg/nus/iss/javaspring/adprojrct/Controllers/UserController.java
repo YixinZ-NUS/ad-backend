@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin("http://3.227.89.83")
 @RestController
 @RequestMapping(value = "/User")
 public class UserController {
@@ -126,9 +126,9 @@ public class UserController {
         return ResponseEntity.ok(totalSpending);
     }
 
-    @GetMapping("/total-spending-last-month/{userId}")
+    @GetMapping("/total-spending-this-month/{userId}")
     public ResponseEntity<Double> getTotalSpendingLastMonth(@PathVariable int userId) {
-        double totalSpending = transactionService.getTotalSpendingLastMonth(userId);
+        double totalSpending = transactionService.getTotalSpendingThisMonth(userId);
         return ResponseEntity.ok(totalSpending);
     }
 

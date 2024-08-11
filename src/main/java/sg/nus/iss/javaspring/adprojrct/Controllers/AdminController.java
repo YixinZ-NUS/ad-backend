@@ -15,7 +15,7 @@ import sg.nus.iss.javaspring.adprojrct.Services.UserService;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin("http://3.227.89.83")
 @RestController
 @RequestMapping(value = "/Admin")
 public class AdminController {
